@@ -18,7 +18,6 @@
       padding:15px;
       background:#000;
       border-bottom:1px solid #222;
-      flex-wrap:wrap;
     }
 
     header img{height:90px;}
@@ -49,7 +48,6 @@
     }
 
     .container{padding:15px;}
-
     h2{text-align:center;}
 
     .products{
@@ -64,6 +62,7 @@
       border-radius:12px;
       text-align:center;
       position:relative;
+      border:1px solid rgba(255,255,255,0.08);
     }
 
     .card img{width:100%;height:180px;object-fit:cover;border-radius:10px;}
@@ -90,6 +89,7 @@
 
     .order-btn{background:#ff9800;}
 
+    /* CART */
     .modal{
       display:none;
       position:fixed;
@@ -127,23 +127,71 @@
       border-radius:6px;
     }
 
+    .close{
+      position:absolute;
+      top:10px;
+      right:15px;
+      font-size:22px;
+      cursor:pointer;
+    }
+
+    /* FLOAT WHATSAPP */
+    .float-wa{
+      position:fixed;
+      bottom:70px;
+      right:15px;
+      background:#25D366;
+      padding:12px;
+      border-radius:50%;
+      font-size:20px;
+      text-decoration:none;
+    }
+
+    /* BOTTOM MENU */
+    .bottom-menu{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      display:flex;
+      justify-content:space-around;
+      background:#000;
+      padding:10px 0;
+      border-top:1px solid #222;
+    }
+
+    .bottom-menu a{
+      color:#fff;
+      text-decoration:none;
+      font-size:12px;
+      cursor:pointer;
+    }
+
   </style></head>
 <body><header>
   <img src="https://i.ibb.co/9kxM1SWK/file-000000006a44720693a61e760bbdff0f.png" />
   <h1>Export Point</h1>
 </header><div class="top-bar">
-  <input id="search" placeholder="Search..." onkeyup="render()" />
+  <input id="search" placeholder="Search dress..." onkeyup="render()" />
   <div class="cart-box" onclick="openCart()">Cart (<span id="cartCount">0</span>)</div>
 </div><div class="container">
   <h2>Our Collection</h2>
   <div class="products" id="products"></div>
 </div><!-- CART --><div class="modal" id="cartModal" onclick="outsideClose(event)">
   <div class="modal-content">
+    <span class="close" onclick="closeCart()">×</span>
     <h3>Your Cart</h3>
     <div id="cartItems"></div>
     <br>
     <button class="btn order-btn" onclick="checkout()">Order Now</button>
   </div>
+</div><!-- FLOAT WA --><a class="float-wa" href="https://wa.me/8801840501433">💬</a>
+
+<!-- BOTTOM MENU (RESTORED) --><div class="bottom-menu">
+  <a onclick="closeCart()">Home</a>
+  <a onclick="openCart()">Cart</a>
+  <a href="https://wa.me/8801840501433">WhatsApp</a>
+  <a href="https://www.facebook.com/share/14cGcMUQ1ZE/">Facebook</a>
 </div><script>
 let data=[];
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
@@ -181,10 +229,7 @@ function openCart(){
 let box=document.getElementById("cartItems");
 box.innerHTML="";
 
-if(cart.length===0){
-box.innerHTML="<p>Cart empty 🥲</p>";
-return;
-}
+if(cart.length===0){box.innerHTML="Cart empty 🥲";}
 
 cart.forEach((p,i)=>{
 box.innerHTML+=`
@@ -200,18 +245,21 @@ ${p.size} | ${p.price}
 document.getElementById("cartModal").style.display="flex";
 }
 
-function outsideClose(e){
-if(e.target.id=="cartModal") document.getElementById("cartModal").style.display="none";
-}
+function closeCart(){document.getElementById("cartModal").style.display="none";}
 
+function outsideClose(e){if(e.target.id=="cartModal") closeCart();}
+
+/* INVOICE STYLE ORDER */
 function checkout(){
-let msg="🧾 ORDER\n\n";
-cart.forEach(p=>msg+=`${p.name} | ${p.size} | ${p.price}\n`);
+let msg="🧾 ORDER INVOICE\n-------------------\n";
+cart.forEach(p=>{
+msg+=`📦 Product: ${p.name}\n📏 Size: ${p.size}\n💰 Price: ${p.price}\n-------------------\n`;
+});
 window.open("https://wa.me/8801840501433?text="+encodeURIComponent(msg));
 }
 
 function buy(n,s,p){
-let msg=`🧾 ORDER\nProduct:${n}\nSize:${s}\nPrice:${p}`;
+let msg=`🧾 ORDER INVOICE\n📦 ${n}\n📏 ${s}\n💰 ${p}`;
 window.open("https://wa.me/8801840501433?text="+encodeURIComponent(msg));
 }
 </script></body>
