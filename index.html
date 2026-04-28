@@ -43,7 +43,7 @@
 
     input{
       padding:10px;
-      width:200px;
+      width:220px;
       border-radius:8px;
       border:none;
       outline:none;
@@ -88,21 +88,50 @@
 
     .btn{
       display:inline-block;
-      margin-top:8px;
+      margin-top:6px;
       padding:7px 10px;
       background:#25D366;
       color:#fff;
       text-decoration:none;
       border-radius:6px;
-      font-size:13px;
+      font-size:12px;
       cursor:pointer;
+      border:none;
     }
 
-    footer{
-      margin-top:20px;
-      background:#000;
-      text-align:center;
+    .order-btn{
+      background:#ff9800;
+    }
+
+    /* CART MODAL */
+    .modal{
+      display:none;
+      position:fixed;
+      top:0;left:0;
+      width:100%;height:100%;
+      background:rgba(0,0,0,0.7);
+      justify-content:center;
+      align-items:center;
+    }
+
+    .modal-content{
+      background:#111;
       padding:20px;
+      border-radius:12px;
+      width:90%;
+      max-width:400px;
+    }
+
+    .close{
+      float:right;
+      cursor:pointer;
+      font-size:20px;
+    }
+
+    .cart-item{
+      border-bottom:1px solid #333;
+      padding:8px 0;
+      font-size:14px;
     }
 
   </style></head>
@@ -111,20 +140,25 @@
   <h1>Export Point</h1>
 </header><div class="top-bar">
   <input type="text" id="search" placeholder="Search dress..." onkeyup="render()" />
-  <div class="cart-box" onclick="showCart()">
+  <div class="cart-box" onclick="openCart()">
     Cart (<span id="cartCount">0</span>)
   </div>
 </div><div class="container">
   <h2>Our Collection</h2>
   <div class="products" id="products"></div>
-</div><footer>
+</div><!-- CART MODAL --><div class="modal" id="cartModal">
+  <div class="modal-content">
+    <span class="close" onclick="closeCart()">&times;</span>
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <br>
+    <a class="btn" href="https://wa.me/8801840501433">Checkout on WhatsApp</a>
+  </div>
+</div><footer style="text-align:center;padding:20px;background:#000;">
   <p>WhatsApp: 01840501433</p>
-  <a class="btn" href="https://wa.me/8801840501433">Order on WhatsApp</a>
 </footer><script>
 let productsData = [];
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-document.getElementById("cartCount").innerText = cart.length;
 
 fetch("products.json")
   .then(res => res.json())
@@ -139,7 +173,7 @@ function render(){
 
   productsData
   .filter(p => p.name.toLowerCase().includes(search))
-  .forEach((p, i) => {
+  .forEach((p) => {
     html += `
       <div class="card">
         <img src="${p.img}" />
@@ -147,26 +181,36 @@ function render(){
         <p>Size: ${p.size}</p>
         <p>Price: ${p.price}</p>
         <button class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
+        <a class="btn order-btn" href="https://wa.me/8801840501433?text=Order: ${p.name}">Order Now</a>
       </div>
     `;
   });
 
   document.getElementById("products").innerHTML = html;
+  document.getElementById("cartCount").innerText = cart.length;
 }
 
 function addToCart(product){
   cart.push(product);
   localStorage.setItem("cart", JSON.stringify(cart));
   document.getElementById("cartCount").innerText = cart.length;
-  alert("Added to cart!");
 }
 
-function showCart(){
-  let msg = "Your Cart:\n\n";
+function openCart(){
+  let modal = document.getElementById("cartModal");
+  let items = document.getElementById("cartItems");
+
+  items.innerHTML = "";
+
   cart.forEach(p => {
-    msg += `${p.name} - ${p.price}\n`;
+    items.innerHTML += `<div class='cart-item'>${p.name} - ${p.price}</div>`;
   });
-  alert(msg);
+
+  modal.style.display = "flex";
+}
+
+function closeCart(){
+  document.getElementById("cartModal").style.display = "none";
 }
 </script></body>
 </html>
