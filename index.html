@@ -90,7 +90,6 @@
 
     .order-btn{background:#ff9800;}
 
-    /* CART MODAL FIX */
     .modal{
       display:none;
       position:fixed;
@@ -112,47 +111,20 @@
       position:relative;
     }
 
-    .close{
-      position:absolute;
-      top:10px;
-      right:15px;
-      font-size:22px;
-      cursor:pointer;
-    }
-
     .cart-item{
+      display:flex;
+      gap:10px;
+      align-items:center;
       border-bottom:1px solid #333;
       padding:8px 0;
-      font-size:14px;
+      font-size:13px;
     }
 
-    .float-wa{
-      position:fixed;
-      bottom:70px;
-      right:15px;
-      background:#25D366;
-      padding:12px;
-      border-radius:50%;
-      font-size:20px;
-      text-decoration:none;
-    }
-
-    .bottom-menu{
-      position:fixed;
-      bottom:0;
-      left:0;
-      width:100%;
-      display:flex;
-      justify-content:space-around;
-      background:#000;
-      padding:10px 0;
-    }
-
-    .bottom-menu a{
-      color:#fff;
-      text-decoration:none;
-      font-size:12px;
-      cursor:pointer;
+    .cart-item img{
+      width:50px;
+      height:50px;
+      object-fit:cover;
+      border-radius:6px;
     }
 
   </style></head>
@@ -167,19 +139,11 @@
   <div class="products" id="products"></div>
 </div><!-- CART --><div class="modal" id="cartModal" onclick="outsideClose(event)">
   <div class="modal-content">
-    <span class="close" onclick="closeCart()">&times;</span>
     <h3>Your Cart</h3>
     <div id="cartItems"></div>
     <br>
     <button class="btn order-btn" onclick="checkout()">Order Now</button>
   </div>
-</div><a class="float-wa" href="https://wa.me/8801840501433">💬</a>
-
-<div class="bottom-menu">
-  <a onclick="closeCart()">Home</a>
-  <a onclick="openCart()">Cart</a>
-  <a href="https://wa.me/8801840501433">WhatsApp</a>
-  <a href="https://www.facebook.com/share/14cGcMUQ1ZE/">Facebook</a>
 </div><script>
 let data=[];
 let cart=JSON.parse(localStorage.getItem("cart"))||[];
@@ -207,13 +171,37 @@ document.getElementById("products").innerHTML=html;
 document.getElementById("cartCount").innerText=cart.length;
 }
 
-function add(p){cart.push(p);localStorage.setItem("cart",JSON.stringify(cart));render();}
+function add(p){
+cart.push(p);
+localStorage.setItem("cart",JSON.stringify(cart));
+document.getElementById("cartCount").innerText=cart.length;
+}
 
-function openCart(){document.getElementById("cartModal").style.display="flex";}
-function closeCart(){document.getElementById("cartModal").style.display="none";}
+function openCart(){
+let box=document.getElementById("cartItems");
+box.innerHTML="";
+
+if(cart.length===0){
+box.innerHTML="<p>Cart empty 🥲</p>";
+return;
+}
+
+cart.forEach((p,i)=>{
+box.innerHTML+=`
+<div class='cart-item'>
+<img src='${p.img}' />
+<div>
+<b>${p.name}</b><br>
+${p.size} | ${p.price}
+</div>
+</div>`;
+});
+
+document.getElementById("cartModal").style.display="flex";
+}
 
 function outsideClose(e){
-if(e.target.id=="cartModal") closeCart();
+if(e.target.id=="cartModal") document.getElementById("cartModal").style.display="none";
 }
 
 function checkout(){
