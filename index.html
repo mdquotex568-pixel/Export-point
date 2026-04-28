@@ -24,13 +24,11 @@
     header img{
       height:90px;
       width:auto;
-      object-fit:contain;
     }
 
     header h1{
       margin:0;
       font-size:26px;
-      letter-spacing:1px;
     }
 
     .top-bar{
@@ -49,23 +47,19 @@
       outline:none;
     }
 
-    .cart-box, .fb-box{
+    .cart-box{
+      background:#25D366;
       padding:10px 15px;
       border-radius:8px;
       cursor:pointer;
       font-weight:bold;
     }
 
-    .cart-box{background:#25D366;}
-    .fb-box{background:#1877F2; color:#fff; text-decoration:none; display:inline-block;}
-
     .container{
       padding:15px;
     }
 
-    h2{
-      text-align:center;
-    }
+    h2{text-align:center;}
 
     .products{
       display:grid;
@@ -78,6 +72,7 @@
       padding:10px;
       border-radius:12px;
       text-align:center;
+      position:relative;
       border:1px solid rgba(255,255,255,0.08);
     }
 
@@ -88,29 +83,30 @@
       border-radius:10px;
     }
 
+    .badge{
+      position:absolute;
+      top:8px;
+      left:8px;
+      background:red;
+      padding:3px 7px;
+      font-size:10px;
+      border-radius:5px;
+    }
+
     .btn{
-      display:inline-block;
       margin-top:6px;
       padding:7px 10px;
       background:#25D366;
       color:#fff;
-      text-decoration:none;
-      border-radius:6px;
-      font-size:12px;
-      cursor:pointer;
       border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:12px;
     }
 
-    .order-btn{
-      background:#ff9800;
-    }
+    .order-btn{background:#ff9800;}
 
-    .delete-btn{
-      background:#e53935;
-      margin-top:5px;
-    }
-
-    /* CART MODAL */
+    /* CART */
     .modal{
       display:none;
       position:fixed;
@@ -131,30 +127,41 @@
       overflow:auto;
     }
 
-    .close{
-      float:right;
-      cursor:pointer;
-      font-size:20px;
-    }
-
     .cart-item{
-      display:flex;
-      gap:10px;
-      align-items:center;
       border-bottom:1px solid #333;
+      padding:8px 0;
+      font-size:14px;
+    }
+
+    /* FLOAT WHATSAPP */
+    .float-wa{
+      position:fixed;
+      bottom:70px;
+      right:15px;
+      background:#25D366;
+      padding:12px;
+      border-radius:50%;
+      font-size:20px;
+      text-decoration:none;
+    }
+
+    /* BOTTOM MENU */
+    .bottom-menu{
+      position:fixed;
+      bottom:0;
+      left:0;
+      width:100%;
+      display:flex;
+      justify-content:space-around;
+      background:#000;
       padding:10px 0;
+      border-top:1px solid #222;
     }
 
-    .cart-item img{
-      width:50px;
-      height:50px;
-      object-fit:cover;
-      border-radius:6px;
-    }
-
-    .cart-info{
-      flex:1;
-      font-size:13px;
+    .bottom-menu a{
+      color:#fff;
+      text-decoration:none;
+      font-size:12px;
     }
 
   </style></head>
@@ -162,103 +169,74 @@
   <img src="https://i.ibb.co/9kxM1SWK/file-000000006a44720693a61e760bbdff0f.png" />
   <h1>Export Point</h1>
 </header><div class="top-bar">
-  <input type="text" id="search" placeholder="Search dress..." onkeyup="render()" />
-  <div class="cart-box" onclick="openCart()">
-    Cart (<span id="cartCount">0</span>)
-  </div>
-  <a class="fb-box" href="https://www.facebook.com/share/14cGcMUQ1ZE/" target="_blank">Facebook</a>
+  <input id="search" placeholder="Search..." onkeyup="render()" />
+  <div class="cart-box" onclick="openCart()">Cart (<span id="cartCount">0</span>)</div>
 </div><div class="container">
   <h2>Our Collection</h2>
   <div class="products" id="products"></div>
-</div><!-- CART MODAL --><div class="modal" id="cartModal">
+</div><!-- CART --><div class="modal" id="cartModal">
   <div class="modal-content">
-    <span class="close" onclick="closeCart()">&times;</span>
     <h3>Your Cart</h3>
     <div id="cartItems"></div>
     <br>
-    <a class="btn order-btn" id="checkoutBtn" href="#">Order Now (WhatsApp)</a>
+    <button class="btn order-btn" onclick="checkout()">Order Now</button>
   </div>
-</div><footer style="text-align:center;padding:20px;background:#000;">
-  <p>WhatsApp: 01840501433</p>
-</footer><script>
-let productsData = [];
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+</div><!-- FLOAT WA --><a class="float-wa" href="https://wa.me/8801840501433">💬</a>
 
-fetch("products.json")
-  .then(res => res.json())
-  .then(data => {
-    productsData = data;
-    render();
-  });
+<!-- BOTTOM MENU --><div class="bottom-menu">
+  <a href="#">Home</a>
+  <a onclick="openCart()">Cart</a>
+  <a href="https://wa.me/8801840501433">WhatsApp</a>
+  <a href="https://www.facebook.com/share/14cGcMUQ1ZE/">Facebook</a>
+</div><script>
+let data=[];
+let cart=JSON.parse(localStorage.getItem("cart"))||[];
+
+fetch("products.json").then(r=>r.json()).then(d=>{data=d;render();});
 
 function render(){
-  let search = document.getElementById("search").value.toLowerCase();
-  let html = "";
+let s=document.getElementById("search").value.toLowerCase();
+let html="";
 
-  productsData
-  .filter(p => p.name.toLowerCase().includes(search))
-  .forEach((p, index) => {
-    html += `
-      <div class="card">
-        <img src="${p.img}" />
-        <h3>${p.name}</h3>
-        <p>Size: ${p.size}</p>
-        <p>Price: ${p.price}</p>
-        <button class="btn" onclick='addToCart(${JSON.stringify(p)})'>Add to Cart</button>
-        <a class="btn order-btn" href="https://wa.me/8801840501433?text=Order: ${p.name}">Order Now</a>
-      </div>
-    `;
-  });
+data.filter(p=>p.name.toLowerCase().includes(s)).forEach(p=>{
+html+=`
+<div class='card'>
+<span class='badge'>NEW</span>
+<img src='${p.img}' />
+<h3>${p.name}</h3>
+<p>${p.size}</p>
+<p>${p.price}</p>
+<button class='btn' onclick='add(${JSON.stringify(p)})'>Add</button>
+<button class='btn order-btn' onclick='buy("${p.name}","${p.size}","${p.price}")'>Order</button>
+</div>`;
+});
 
-  document.getElementById("products").innerHTML = html;
-  document.getElementById("cartCount").innerText = cart.length;
+document.getElementById("products").innerHTML=html;
+document.getElementById("cartCount").innerText=cart.length;
 }
 
-function addToCart(product){
-  cart.push(product);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  document.getElementById("cartCount").innerText = cart.length;
-}
-
-function removeItem(i){
-  cart.splice(i,1);
-  localStorage.setItem("cart", JSON.stringify(cart));
-  openCart();
-  document.getElementById("cartCount").innerText = cart.length;
-}
+function add(p){cart.push(p);localStorage.setItem("cart",JSON.stringify(cart));render();}
 
 function openCart(){
-  let modal = document.getElementById("cartModal");
-  let items = document.getElementById("cartItems");
-
-  items.innerHTML = "";
-
-  cart.forEach((p,i) => {
-    items.innerHTML += `
-      <div class='cart-item'>
-        <img src="${p.img}" />
-        <div class='cart-info'>
-          <b>${p.name}</b><br>
-          ${p.size} | ${p.price}
-        </div>
-        <button class='btn delete-btn' onclick='removeItem(${i})'>X</button>
-      </div>
-    `;
-  });
-
-  let msg = "";
-  cart.forEach(p => {
-    msg += p.name + " - " + p.price + "%0A";
-  });
-
-  document.getElementById("checkoutBtn").href =
-    "https://wa.me/8801840501433?text=Order:%0A" + msg;
-
-  modal.style.display = "flex";
+let h="";
+cart.forEach((p,i)=>{
+ h+=`<div class='cart-item'>${p.name} - ${p.price}</div>`;
+});
+document.getElementById("cartItems").innerHTML=h;
+document.getElementById("cartModal").style.display="flex";
 }
 
-function closeCart(){
-  document.getElementById("cartModal").style.display = "none";
+function checkout(){
+let msg="🧾 ORDER\n\n";
+cart.forEach(p=>{
+msg+=`${p.name} | ${p.size} | ${p.price}\n`;
+});
+window.open("https://wa.me/8801840501433?text="+encodeURIComponent(msg));
+}
+
+function buy(n,s,p){
+let msg=`🧾 ORDER\nProduct:${n}\nSize:${s}\nPrice:${p}`;
+window.open("https://wa.me/8801840501433?text="+encodeURIComponent(msg));
 }
 </script></body>
 </html>
